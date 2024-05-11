@@ -1,4 +1,8 @@
-import requests,time
+import requests, os, threading
+import time
+from flask import Flask
+
+app = Flask(__name__)
 
 def read_phone_number(file_path):
     with open(file_path, 'r') as file:
@@ -239,5 +243,21 @@ def send_all_otps():
         except Exception as e:
             print(f"Error sending OTPs to {phone_number}: {e}")
 
-while True:
-    send_all_otps()
+@app.route('/')
+def home():
+    return 'OTP sending process is running'
+
+def run_flask_app():
+    port = int(os.environ.get('PORT', 5000))  # Default to 5000 if PORT is not set
+    app.run(host='0.0.0.0', port=port, debug=True, use_reloader=False)
+
+if __name__ == "__main__":
+    flask_thread = threading.Thread(target=run_flask_app)
+    flask_thread.start()
+
+    while True:
+        try:
+            send_all_otps()
+            time.sleep(60)
+        except Exception as e:
+            print(f"Error: {e}")

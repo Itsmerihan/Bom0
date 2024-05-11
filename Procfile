@@ -1,1 +1,1 @@
-worker: python sms.py
+web: python sms.py
